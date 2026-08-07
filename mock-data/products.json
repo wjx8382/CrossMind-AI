@@ -1,0 +1,25 @@
+{
+  "products": [
+    {
+      "product": "Portable Blender",
+      "market": "USA Amazon",
+      "monthlySearchGrowth": 22.0,
+      "yearlyMarketGrowth": 18.5,
+      "competitors": [
+        { "brand": "BlendJet", "price": 49.95, "rating": 4.1 },
+        { "brand": "Ninja", "price": 59.99, "rating": 4.4 },
+        { "brand": "Hamilton Beach", "price": 29.99, "rating": 4.0 },
+        { "brand": "Generic Travel Blender", "price": 24.99, "rating": 3.7 }
+      ],
+      "reviews": [
+        "battery life is bad and charging takes too long",
+        "easy to carry and good for travel",
+        "hard to clean under the blade",
+        "not powerful enough for frozen fruit",
+        "compact design and easy to use",
+        "the cup leaks if it is not closed tightly"
+      ]
+    }
+  ]
+}
+
