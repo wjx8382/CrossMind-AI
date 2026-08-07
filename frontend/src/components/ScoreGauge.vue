@@ -54,20 +54,9 @@ const option = computed(() => ({
       splitLine: { show: false },
       axisLabel: { show: false },
       anchor: { show: false },
-      title: {
-        offsetCenter: [0, '34%'],
-        color: '#94a3b8',
-        fontSize: 13,
-      },
-      detail: {
-        valueAnimation: true,
-        offsetCenter: [0, '-4%'],
-        color: '#f8fafc',
-        fontSize: 46,
-        fontWeight: 700,
-        formatter: '{value}',
-      },
-      data: [{ value: props.score, name: '市场机会 / 100' }],
+      title: { show: false },
+      detail: { show: false },
+      data: [{ value: props.score }],
     },
   ],
 }))
@@ -96,13 +85,50 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="chartElement" class="score-gauge" role="img" :aria-label="`市场机会评分 ${score} 分`"></div>
+  <div class="score-gauge" role="img" :aria-label="`市场机会评分 ${score} 分`">
+    <div ref="chartElement" class="score-gauge__chart" aria-hidden="true"></div>
+    <div class="score-gauge__value" aria-hidden="true">
+      <strong>{{ score }}</strong>
+      <span>市场机会 / 100</span>
+    </div>
+  </div>
 </template>
 
 <style scoped>
 .score-gauge {
+  position: relative;
   width: 100%;
-  height: 245px;
+  height: 230px;
+}
+
+.score-gauge__chart {
+  width: 100%;
+  height: 100%;
+}
+
+.score-gauge__value {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding-top: 8px;
+  pointer-events: none;
+}
+
+.score-gauge__value strong {
+  color: #f8fafc;
+  font-size: clamp(40px, 4vw, 48px);
+  font-weight: 750;
+  line-height: .95;
+  letter-spacing: -.045em;
+}
+
+.score-gauge__value span {
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.4;
 }
 </style>
-
