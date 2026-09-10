@@ -4,7 +4,7 @@
 
 CrossMind AI 面向跨境电商卖家。用户只需输入商品与目标市场，系统即可异步执行四个 AI Agent，并生成可导出 PDF 的《商品市场进入分析报告》。项目以黑客松演示为目标，具备完整用户流程、可观察的 Agent 执行过程和无需 API Key 的离线演示能力。
 
-当前状态：**MVP 已完成，可本地运行与录制 Demo。**
+当前状态：**复赛 MVP 已完成，可本地/容器运行、调用赛事 Token Plan，并可录制完整 Demo。**
 
 ## 业务痛点
 
@@ -75,6 +75,8 @@ CrossMind-AI/
 ├── docs/                 # 架构、演示与提交材料
 ├── mock-data/            # 可复现的演示商品数据
 ├── docker-compose.yml    # PostgreSQL 与 Redis
+├── compose.deploy.yml    # 前后端 + 数据服务一键部署
+├── Dockerfile            # 单容器交付 Web 与 API
 └── README.md
 ```
 
@@ -151,11 +153,23 @@ VITE_DEV_PORT=15173 VITE_DEV_API_TARGET=http://localhost:18080 npm run dev
 ```bash
 export DASHSCOPE_API_KEY='your-api-key'
 export AI_PROVIDER='bailian'
-export AI_MODEL='qwen-plus'
+export AI_MODEL='qwen3.7-plus'
+export AI_BASE_URL='https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1'
 mvn spring-boot:run
 ```
 
-不要将真实 API Key 写入配置文件或提交到 GitHub。模型地址和超时可通过 `AI_BASE_URL`、`AI_CONNECT_TIMEOUT`、`AI_READ_TIMEOUT` 覆盖；设置 `AI_PROVIDER=mock` 可强制使用 Mock。
+赛事 Token Plan 的 Key 必须和专属基地址配套使用。不要将真实 API Key 写入配置文件或提交到 GitHub。模型地址和超时可通过 `AI_BASE_URL`、`AI_CONNECT_TIMEOUT`、`AI_READ_TIMEOUT` 覆盖；设置 `AI_PROVIDER=mock` 可强制使用 Mock。页面右上角会显示当前是 `REAL AI` 还是安全演示模式，但不会返回或展示密钥。
+
+## 一键容器部署
+
+复制环境变量示例并按需填写；不填写 Key 时也能完整体验 Mock Agent 流程：
+
+```bash
+cp .env.example .env
+docker compose -f compose.deploy.yml up -d --build
+```
+
+浏览器访问 `http://localhost:8080`。该部署会同时启动 Web/API、PostgreSQL 和 Redis，适合云服务器、演示机和评审环境。真实线上环境请修改数据库密码，并通过部署平台的 Secret 功能注入 API Key。
 
 ## API 示例
 

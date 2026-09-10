@@ -10,7 +10,7 @@ CrossMind AI —— AI 跨境选品分析助手
 
 ## 参赛方向
 
-AI + 跨境电商 / Multi-Agent 商业决策辅助
+AI 市场洞察 / Multi-Agent 跨境选品决策辅助
 
 ## 项目简介（可直接用于报名表）
 
@@ -46,10 +46,11 @@ Vue 3、Vite、Element Plus、ECharts、Java 21、Spring Boot 3、Spring Data JP
 
 `Multi-Agent cross-border product research assistant built with Vue 3, Spring Boot 3 and Alibaba Bailian.`
 
-## 提交前待替换项
+## 复赛固定信息
 
-- 团队名称：`<填写团队名称>`
-- GitHub 地址：`<填写公开仓库地址>`
+- 团队名称：`Agent Forge`
+- 队长：`吴健雄`
+- GitHub 地址：`https://github.com/wjx8382/CrossMind-AI`
 - Demo 视频：`<填写公开视频地址>`
 - 在线体验：`<如有则填写>`
-- 联系方式：`<按赛事要求填写>`
+- 参赛场景：`AI市场洞察`

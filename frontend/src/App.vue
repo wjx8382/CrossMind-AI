@@ -1,5 +1,5 @@
 <script setup>
-import { computed, defineAsyncComponent, onBeforeUnmount, reactive, ref } from 'vue'
+import { computed, defineAsyncComponent, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import {
   ElAlert,
   ElButton,
@@ -11,7 +11,7 @@ import {
   ElProgress,
   ElTag,
 } from 'element-plus'
-import { createAnalysis, getAnalysis } from './api/analysis'
+import { createAnalysis, getAnalysis, getHealth } from './api/analysis'
 
 const ScoreGauge = defineAsyncComponent(() => import('./components/ScoreGauge.vue'))
 
@@ -37,12 +37,13 @@ const submitting = ref(false)
 const analysisId = ref('')
 const analysis = ref(null)
 const workflowError = ref('')
+const aiRuntime = ref(null)
 let pollTimer
 let consecutivePollErrors = 0
 
 const displayTasks = computed(() => agentDefinitions.map((definition) => {
   const liveTask = analysis.value?.agentTasks?.find((task) => task.agentType === definition.type)
-  return { ...definition, status: liveTask?.status || 'PENDING' }
+  return { ...definition, status: liveTask?.status || 'PENDING', result: liveTask?.result || null }
 }))
 
 const progressPercent = computed(() => {
@@ -145,6 +146,21 @@ function taskStatusClass(status) {
   return status.toLowerCase()
 }
 
+function taskResultSummary(task) {
+  const result = task.result
+  if (!result) return ''
+  return result.summary || result.strategy || result.marketingSuggestion || ''
+}
+
+async function loadRuntime() {
+  try {
+    aiRuntime.value = (await getHealth()).ai
+  } catch {
+    aiRuntime.value = null
+  }
+}
+
+onMounted(loadRuntime)
 onBeforeUnmount(clearPollTimer)
 </script>
 
@@ -159,7 +175,9 @@ onBeforeUnmount(clearPollTimer)
         </span>
       </button>
       <div class="topbar-meta">
-        <span class="live-indicator"><i></i> Agent System Online</span>
+        <span class="live-indicator"><i></i>
+          {{ aiRuntime?.live ? `${aiRuntime.model} · REAL AI` : 'DEMO SAFE MODE' }}
+        </span>
         <ElTag effect="dark" round>Hackathon MVP</ElTag>
       </div>
     </header>
@@ -240,6 +258,7 @@ onBeforeUnmount(clearPollTimer)
               <div class="task-copy">
                 <strong>{{ task.name }} Agent</strong>
                 <span>{{ task.description }}</span>
+                <small v-if="taskResultSummary(task)" class="task-result">{{ taskResultSummary(task) }}</small>
               </div>
               <span class="task-status">{{ taskStatusLabel(task.status) }}</span>
             </article>
@@ -377,7 +396,7 @@ onBeforeUnmount(clearPollTimer)
 .form-footnote { display: flex; justify-content: center; gap: 9px; margin-top: 22px; color: #64748b; font-size: 10px; letter-spacing: .04em; }
 .analysis-view { min-height: calc(100vh - 85px); padding: 64px 0 90px; }.analysis-heading { text-align: center; }.eyebrow-simple { margin: 0 0 13px; color: #818cf8 !important; font-size: 10px !important; font-weight: 750; letter-spacing: .2em; }.analysis-heading h1, .report-header h1 { margin: 0; font-size: clamp(34px, 4vw, 54px); letter-spacing: -.035em; }.analysis-heading > p { color: var(--muted); font-size: 14px; }.task-id { display: inline-block; margin-top: 8px; padding: 7px 12px; border: 1px solid var(--border); border-radius: 99px; color: #64748b; font: 10px ui-monospace, monospace; letter-spacing: .12em; }
 .workflow-layout { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(300px, .6fr); gap: 24px; max-width: 1050px; margin: 46px auto 0; }.workflow-progress > div { display: flex; justify-content: space-between; margin-bottom: 12px; color: var(--muted); font-size: 12px; }.workflow-progress strong { color: #c4b5fd; font: 13px ui-monospace, monospace; }
-.agent-list { margin-top: 24px; }.agent-task { display: grid; grid-template-columns: 34px 34px 1fr auto; gap: 13px; align-items: center; min-height: 78px; padding: 13px 4px; border-top: 1px solid rgba(148, 163, 184, .09); opacity: .48; transition: .3s ease; }.agent-task.running, .agent-task.completed { opacity: 1; }.task-number { color: #475569; font: 10px ui-monospace, monospace; }.task-status-icon { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid #334155; border-radius: 10px; color: #64748b; }.task-status-icon i { width: 9px; height: 9px; border-radius: 50%; background: #818cf8; box-shadow: 0 0 15px #6366f1; animation: pulse 1.2s infinite; }.completed .task-status-icon { color: #34d399; border-color: rgba(52, 211, 153, .35); background: rgba(16, 185, 129, .08); }.failed .task-status-icon { color: #fb7185; border-color: rgba(251, 113, 133, .35); }.task-copy { display: grid; gap: 5px; }.task-copy strong { font-size: 14px; }.task-copy span { color: var(--muted); font-size: 11px; }.task-status { color: #64748b; font-size: 10px; }.running .task-status { color: #a78bfa; }.completed .task-status { color: #34d399; }
+.agent-list { margin-top: 24px; }.agent-task { display: grid; grid-template-columns: 34px 34px 1fr auto; gap: 13px; align-items: center; min-height: 78px; padding: 13px 4px; border-top: 1px solid rgba(148, 163, 184, .09); opacity: .48; transition: .3s ease; }.agent-task.running, .agent-task.completed { opacity: 1; }.task-number { color: #475569; font: 10px ui-monospace, monospace; }.task-status-icon { display: grid; place-items: center; width: 30px; height: 30px; border: 1px solid #334155; border-radius: 10px; color: #64748b; }.task-status-icon i { width: 9px; height: 9px; border-radius: 50%; background: #818cf8; box-shadow: 0 0 15px #6366f1; animation: pulse 1.2s infinite; }.completed .task-status-icon { color: #34d399; border-color: rgba(52, 211, 153, .35); background: rgba(16, 185, 129, .08); }.failed .task-status-icon { color: #fb7185; border-color: rgba(251, 113, 133, .35); }.task-copy { display: grid; gap: 5px; min-width: 0; }.task-copy strong { font-size: 14px; }.task-copy span { color: var(--muted); font-size: 11px; }.task-result { overflow: hidden; color: #c4b5fd; font-size: 11px; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }.task-status { color: #64748b; font-size: 10px; }.running .task-status { color: #a78bfa; }.completed .task-status { color: #34d399; }
 .agent-console { position: relative; display: flex; min-height: 410px; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(99, 102, 241, .18); border-radius: 22px; background: rgba(7, 11, 23, .76); text-align: center; }.console-glow { position: absolute; width: 240px; height: 240px; border-radius: 50%; background: rgba(79, 70, 229, .14); filter: blur(54px); }.agent-console > p { color: #64748b; font-size: 9px; letter-spacing: .2em; }.agent-console h2 { margin: 22px 0 8px; font-size: 18px; }.agent-console > span { max-width: 220px; color: var(--muted); font-size: 11px; line-height: 1.6; }.orb { position: relative; display: grid; place-items: center; width: 102px; height: 102px; margin-top: 20px; border: 1px solid rgba(129, 140, 248, .26); border-radius: 50%; background: radial-gradient(circle, rgba(99, 102, 241, .35), rgba(30, 41, 59, .08) 65%); box-shadow: 0 0 48px rgba(99, 102, 241, .24); }.orb::before, .orb::after { content: ''; position: absolute; inset: -11px; border: 1px solid rgba(129, 140, 248, .2); border-radius: 50%; animation: spin 7s linear infinite; border-top-color: #818cf8; }.orb::after { inset: 13px; animation-direction: reverse; animation-duration: 4s; }.orb > span { width: 20px; height: 20px; border-radius: 50%; background: #818cf8; box-shadow: 0 0 28px #6366f1; }.orb.complete > span { display: grid; place-items: center; width: 38px; height: 38px; color: white; background: #10b981; }.signal-lines { display: flex; align-items: center; gap: 4px; height: 30px; margin-top: 24px; }.signal-lines i { width: 2px; height: 8px; background: #6366f1; animation: signal .8s ease-in-out infinite alternate; }.signal-lines i:nth-child(2), .signal-lines i:nth-child(4) { animation-delay: .2s; }.signal-lines i:nth-child(3) { animation-delay: .4s; }
 .workflow-error { max-width: 1050px; margin: 20px auto 0; }.error-actions { margin-top: 10px; }
 .report-view { padding: 54px 0 70px; }.report-header { display: flex; align-items: end; justify-content: space-between; gap: 30px; margin-bottom: 36px; }.report-header > div:first-child { min-width: 0; }.report-header h1 { overflow-wrap: anywhere; }.report-header p:last-child { color: var(--muted); }.report-actions { display: flex; gap: 10px; }.report-grid { display: grid; gap: 18px; }.report-summary { grid-template-columns: .8fr .8fr 1.4fr; }.report-summary > * { min-width: 0; }.score-card :deep(.el-card__body) { display: flex; height: 100%; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }.summary-stack { display: grid; gap: 18px; }.metric-card :deep(.el-card__body) { display: flex; height: 100%; flex-direction: column; }.metric-card span, .section-label { color: var(--muted); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }.metric-card strong { margin: auto 0 8px; font-size: 30px; }.metric-card small { color: #64748b; line-height: 1.5; }.strategy-card :deep(.el-card__body) { display: flex; height: 100%; flex-direction: column; }.strategy-card blockquote { margin: auto 0; overflow-wrap: anywhere; font-size: clamp(21px, 2.2vw, 30px); font-weight: 650; line-height: 1.55; letter-spacing: -.02em; }.strategy-meta { display: flex; justify-content: space-between; padding-top: 20px; border-top: 1px solid var(--border); color: #64748b; font: 9px ui-monospace, monospace; letter-spacing: .1em; }

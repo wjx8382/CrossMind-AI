@@ -5,6 +5,7 @@ frontend/dist/
 # Backend
 backend/target/
 backend/.m2/
+.m2-repository/
 
 # IDE and OS
 .idea/
@@ -15,3 +16,12 @@ backend/.m2/
 # Local configuration
 .env
 application-local.yml
+
+# Locally generated submission artifacts
+tmp/
+deliverables/source/
+deliverables/package/*.zip
+deliverables/video/*.aiff
+deliverables/video/*.mp4
+deliverables/final/*.docx
+deliverables/final/*.pdf

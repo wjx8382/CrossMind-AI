@@ -19,6 +19,7 @@ import com.crossmind.ai.model.ProductAnalysis;
 import com.crossmind.ai.repository.AgentTaskRepository;
 import com.crossmind.ai.repository.ProductAnalysisRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -62,7 +63,8 @@ public class AnalysisService {
         AnalysisReport report = readReport(analysis);
         List<AgentTaskResponse> agentTasks = taskRepository.findByAnalysis_IdOrderByCreatedTimeAsc(analysisId)
                 .stream()
-                .map(task -> new AgentTaskResponse(task.getAgentType(), task.getStatus()))
+                .map(task -> new AgentTaskResponse(
+                        task.getAgentType(), task.getStatus(), readTaskResult(task.getResult())))
                 .toList();
 
         return new AnalysisDetailResponse(
@@ -92,6 +94,17 @@ public class AnalysisService {
             return objectMapper.readValue(analysis.getResultJson(), AnalysisReport.class);
         } catch (JsonProcessingException exception) {
             throw new IllegalStateException("分析报告 JSON 无法解析", exception);
+        }
+    }
+
+    private JsonNode readTaskResult(String result) {
+        if (result == null || result.isBlank()) {
+            return null;
+        }
+        try {
+            return objectMapper.readTree(result);
+        } catch (JsonProcessingException exception) {
+            throw new IllegalStateException("Agent 任务结果 JSON 无法解析", exception);
         }
     }
 }

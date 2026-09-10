@@ -18,5 +18,9 @@ public class MockLLMClient implements LLMClient {
         }
         return "Mock AI 已完成分析。";
     }
-}
 
+    @Override
+    public LLMRuntimeInfo runtimeInfo() {
+        return new LLMRuntimeInfo("mock", "deterministic-demo", false);
+    }
+}

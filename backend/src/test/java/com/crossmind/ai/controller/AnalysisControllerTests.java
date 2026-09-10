@@ -60,7 +60,18 @@ class AnalysisControllerTests {
                 .andExpect(jsonPath("$.productSuggestions.length()").value(3))
                 .andExpect(jsonPath("$.agentTasks.length()").value(4))
                 .andExpect(jsonPath("$.agentTasks[0].status").value("COMPLETED"))
+                .andExpect(jsonPath("$.agentTasks[0].result.summary", notNullValue()))
                 .andExpect(jsonPath("$.agentTasks[3].status").value("COMPLETED"));
+    }
+
+    @Test
+    void exposesSafeAiRuntimeMetadata() throws Exception {
+        mockMvc.perform(get("/api/health"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"))
+                .andExpect(jsonPath("$.ai.provider").value("mock"))
+                .andExpect(jsonPath("$.ai.model").value("deterministic-demo"))
+                .andExpect(jsonPath("$.ai.live").value(false));
     }
 
     @Test

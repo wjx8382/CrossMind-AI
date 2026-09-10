@@ -18,3 +18,7 @@ export async function getAnalysis(analysisId) {
   return data
 }
 
+export async function getHealth() {
+  const { data } = await apiClient.get('/api/health')
+  return data
+}

@@ -1,0 +1,12 @@
+.git
+.github
+.idea
+.vscode
+.m2-repository
+backend/target
+frontend/dist
+frontend/node_modules
+deliverables
+tmp
+*.log
+.env

@@ -47,6 +47,11 @@ public class BailianLLMClient implements LLMClient {
         }
     }
 
+    @Override
+    public LLMRuntimeInfo runtimeInfo() {
+        return new LLMRuntimeInfo("bailian", properties.model(), true);
+    }
+
     private String extractContent(ChatResponse response) {
         if (response == null || response.choices() == null || response.choices().isEmpty()
                 || response.choices().getFirst().message() == null
@@ -69,4 +74,3 @@ public class BailianLLMClient implements LLMClient {
     record Message(String role, String content) {
     }
 }
-

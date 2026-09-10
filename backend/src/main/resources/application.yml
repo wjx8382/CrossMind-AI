@@ -28,7 +28,7 @@ agent:
 ai:
   provider: ${AI_PROVIDER:bailian}
   api-key: ${DASHSCOPE_API_KEY:}
-  model: ${AI_MODEL:qwen-plus}
-  base-url: ${AI_BASE_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
+  model: ${AI_MODEL:qwen3.7-plus}
+  base-url: ${AI_BASE_URL:https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1}
   connect-timeout: ${AI_CONNECT_TIMEOUT:10s}
   read-timeout: ${AI_READ_TIMEOUT:60s}
